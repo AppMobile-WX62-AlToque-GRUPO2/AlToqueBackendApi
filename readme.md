@@ -7,5 +7,6 @@
 - .\venv\Scripts\activate.ps1
 - Hago el requirements.txt
 - pip install -r .\requirements.txt
+- Modificar el URL_DATABASE
 - uvicorn main:app --port 8001
--Encuentro los métodos http://127.0.0.1:8001/docs
+- Encuentro los métodos http://127.0.0.1:8001/docs
