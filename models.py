@@ -2,12 +2,18 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, DateT
 from sqlalchemy.orm import relationship
 from database import Base
 
+class Province(Base):
+    __tablename__ = "province"
 
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50), nullable=False)
+    
 class City(Base):
     __tablename__ = "city"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(50), nullable=False)
+    provinceId = Column(Integer, ForeignKey('province.id'), nullable=False)
 
 
 class District(Base):

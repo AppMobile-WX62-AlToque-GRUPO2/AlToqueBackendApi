@@ -5,7 +5,6 @@
 - pip install virtualenv
 - virtualenv venv
 - .\venv\Scripts\activate.ps1
-- Hago el requirements.txt
 - pip install -r .\requirements.txt
 - Modificar el URL_DATABASE
 - uvicorn main:app --port 8001
