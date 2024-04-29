@@ -4,9 +4,14 @@ from typing import Annotated
 import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
+from fastapi.responses import RedirectResponse
 
-app = FastAPI()
+app = FastAPI(title="AlToqueAPI")
 models.Base.metadata.create_all(bind=engine)
+
+@app.get("/", include_in_schema=False)
+def index():
+    return RedirectResponse("/docs", status_code=300)
 
 class UserBase(BaseModel):
     password: str
