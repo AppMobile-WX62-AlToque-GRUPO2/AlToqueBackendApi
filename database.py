@@ -3,11 +3,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import os
 
-DB_HOST = os.environ.get("DB_HOST")
-DB_USER = os.environ.get("DB_USER")
-DB_PASSWORD = os.environ.get("DB_PASSWORD")
-DB_NAME = os.environ.get("DB_NAME")
-DB_PORT = os.environ.get("DB_PORT")
+DB_HOST = "roundhouse.proxy.rlwy.net"
+DB_USER = "root"
+DB_PASSWORD = "GqxRyzzDxMgRCAsadwNhDefsnSQhkhvF"
+DB_NAME = "railway"
+DB_PORT = "57433"
 
 URL_DATABASE = f'mysql+pymysql://{DB_HOST}:{DB_USER}@{DB_PASSWORD}:{DB_PORT}/{DB_NAME}'
 
