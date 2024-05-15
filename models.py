@@ -67,6 +67,7 @@ class Specialist(Base):
     workExperience = Column(Float(5, 2), nullable=False)
     Profession_idProfession = Column(Integer, ForeignKey('profession.id'), nullable=False)
     personaId = Column(Integer, ForeignKey('persona.id'), nullable=False)
+    consultationPrice = Column(Float, nullable=True)
 
 class Post(Base):
     __tablename__ = "post"

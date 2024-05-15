@@ -39,7 +39,6 @@ class PersonaBase(BaseModel):
     avatar: str
     phone: str
     birthdate: str
-    money: float
     description: str
     rating: int
     userId: int
@@ -50,6 +49,7 @@ class ProfessionBase(BaseModel):
 
 class SpecialistBase(BaseModel):
     workExperience: float
+    consultationPrice: float
     Profession_idProfession: int
     personaId: int
 
