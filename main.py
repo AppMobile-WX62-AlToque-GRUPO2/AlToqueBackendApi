@@ -16,15 +16,16 @@ def index():
 class UserBase(BaseModel):
     password: str
     email: str
+    role: bool
     
 class ContractBase(BaseModel):
     price: float
     state: int
     appointmentDate: str
-    publicationId: int
+    postId: int
     specialistId: int
     
-class PublicationBase(BaseModel):
+class PostBase(BaseModel):
     title: str
     description: str
     address: str
@@ -36,7 +37,6 @@ class PersonaBase(BaseModel):
     firstName: str
     lastName: str
     avatar: str
-    role: bool
     phone: str
     birthdate: str
     money: float
@@ -167,7 +167,7 @@ async def delete_persona(persona_id: int, db:db_dependency):
 
 
 """ Professions """
-@app.post("professions", status_code=status.HTTP_201_CREATED, tags=["Professions"])
+@app.post("/professions", status_code=status.HTTP_201_CREATED, tags=["Professions"])
 async def create_profession(profession: ProfessionBase, db: db_dependency):
     db_profession = models.Profession(**profession.dict())
     db.add(db_profession)
@@ -244,44 +244,42 @@ async def delete_specialist(specialist_id: int, db:db_dependency):
 
 
 
-""" Publications """
-@app.post("/publications", status_code=status.HTTP_201_CREATED, tags=["Publications"])
-async def create_publication(publication: PublicationBase, db: db_dependency):
-    db_publication = models.Publication(**publication.dict())
-    db.add(db_publication)
+""" Posts """
+@app.post("/posts", status_code=status.HTTP_201_CREATED, tags=["Posts"])
+async def create_post(post: PostBase, db: db_dependency):
+    db_post = models.Post(**post.dict())
+    db.add(db_post)
     db.commit()
-    return db_publication
+    return db_post
 
-@app.get("/publications/{publication_id}", status_code=status.HTTP_200_OK, tags=["Publications"])
-async def read_publication(publication_id: int, db: db_dependency):
-    publication = db.query(models.Publication).filter(models.Publication.id == publication_id).first()
-    if publication is None:
-        raise HTTPException(status_code=404, detail="Publication not found")
-    return publication
+@app.get("/posts/{post_id}", status_code=status.HTTP_200_OK, tags=["Posts"])
+async def read_post(post_id: int, db: db_dependency):
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return post
 
-@app.put("/publications/{publication_id}", status_code=status.HTTP_200_OK, tags=["Publications"])
-async def update_publication(publication_id: int, publication: PublicationBase, db: db_dependency):
-    db_publication = db.query(models.Publication).filter(models.Publication.id == publication_id).first()
-    if db_publication is None:
-        raise HTTPException(status_code=404, detail="Publication not found")
+@app.put("/posts/{post_id}", status_code=status.HTTP_200_OK, tags=["Posts"])
+async def update_post(post_id: int, post: PostBase, db: db_dependency):
+    db_post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if db_post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
 
     # Actualizar los campos necesarios
-    for var, value in vars(publication).items():
-        setattr(db_publication, var, value) if value else None
+    for var, value in vars(post).items():
+        setattr(db_post, var, value) if value else None
 
     db.commit()
-    return {"message": "Publication updated successfully"}
+    return {"message": "Post updated successfully"}
 
-@app.delete("/publications/{publication_id}", status_code=status.HTTP_200_OK, tags=["Publications"])
-async def delete_publication(publication_id: int, db:db_dependency):
-    db_publication = db.query(models.Publication).filter(models.Publication.id == publication_id).first()
-    if db_publication is None:
-        raise HTTPException(status_code=404, detail="Publication not found")
-    db.delete(db_publication)
+@app.delete("/posts/{post_id}", status_code=status.HTTP_200_OK, tags=["Posts"])
+async def delete_post(post_id: int, db:db_dependency):
+    db_post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if db_post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    db.delete(db_post)
     db.commit()
-    return {"message": "Publication deleted successfully"}
-
-
+    return {"message": "Post deleted successfully"}
 
 
 """ Contracts """

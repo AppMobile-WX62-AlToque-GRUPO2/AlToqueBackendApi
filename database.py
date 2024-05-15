@@ -4,10 +4,10 @@ from sqlalchemy.ext.declarative import declarative_base
 import os
 
 MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'noquHPFErnosWXASUMAQEMSqkYdyEkmF'
-MYSQL_HOST = 'monorail.proxy.rlwy.net'
-MYSQL_PORT = '53379'
-MYSQL_DATABASE = 'railway'
+MYSQL_PASSWORD = 'root'
+MYSQL_HOST = 'localhost'
+MYSQL_PORT = '3306'
+MYSQL_DATABASE = 'altoquedb'
 
 URL_DATABASE = f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'
 

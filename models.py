@@ -37,6 +37,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     password = Column(String(100), nullable=False)
     email = Column(String(100), nullable=False)
+    role = Column(Boolean, nullable=False)
 
 class Persona(Base):
     __tablename__ = "persona"
@@ -45,7 +46,6 @@ class Persona(Base):
     firstName = Column(String(50), nullable=False)
     lastName = Column(String(50), nullable=False)
     avatar = Column(String(500), nullable=False)
-    role = Column(Boolean, nullable=False)
     phone = Column(String(15), nullable=False)
     birthdate = Column(Date, nullable=False)
     money = Column(Float(10, 2), nullable=False)
@@ -68,8 +68,8 @@ class Specialist(Base):
     Profession_idProfession = Column(Integer, ForeignKey('profession.id'), nullable=False)
     personaId = Column(Integer, ForeignKey('persona.id'), nullable=False)
 
-class Publication(Base):
-    __tablename__ = "publication"
+class Post(Base):
+    __tablename__ = "post"
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(50), nullable=False)
@@ -86,7 +86,7 @@ class Contract(Base):
     price = Column(Float(10, 2), nullable=False)
     state = Column(Integer, nullable=False)
     appointmentDate = Column(DateTime, nullable=False)
-    publicationId = Column(Integer, ForeignKey('publication.id'), nullable=False)
+    postId = Column(Integer, ForeignKey('post.id'), nullable=False)
     specialistId = Column(Integer, ForeignKey('specialist.id'), nullable=False)
     
 class Review(Base):
