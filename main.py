@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from pydantic import BaseModel
 from typing import Annotated
-import models
+import models.models as models
 from config.database import engine, get_db
 from sqlalchemy.orm import Session
 from fastapi.responses import RedirectResponse
