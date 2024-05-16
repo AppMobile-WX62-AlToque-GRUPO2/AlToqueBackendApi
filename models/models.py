@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, DateTime, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, Float, Time
 from config.database import Base
 
 class Province(Base):
@@ -78,17 +78,24 @@ class Post(Base):
     image = Column(String(500), nullable=False)
     is_publish = Column(Boolean, nullable=False)
     personaId = Column(Integer, ForeignKey('persona.id'), nullable=False)
-    
+
+class AvailableDate(Base):
+    __tablename__ = "availableDate"
+
+    id = Column(Integer, primary_key=True, index=True)
+    start_time = Column(Time, nullable=False)
+    end_time = Column(Time, nullable=False)
+    day = Column(String(10), nullable=False)
+    postId = Column(Integer, ForeignKey('post.id'), nullable=False)
+
 class Contract(Base):
     __tablename__ = "contract"
 
     id = Column(Integer, primary_key=True, index=True)
-    price = Column(Float(10, 2), nullable=False)
     state = Column(Integer, nullable=False)
-    appointmentDate = Column(DateTime, nullable=False)
-    postId = Column(Integer, ForeignKey('post.id'), nullable=False)
+    availableDateId = Column(Integer, ForeignKey('availableDate.id'), nullable=False)
     specialistId = Column(Integer, ForeignKey('specialist.id'), nullable=False)
-    
+
 class Review(Base):
     __tablename__ = "review"
 
