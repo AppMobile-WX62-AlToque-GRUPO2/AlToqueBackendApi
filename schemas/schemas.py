@@ -58,3 +58,16 @@ class ContractBase(BaseModel):
     state: int
     availableDateId: int
     specialistId: int
+
+class ReviewBase(BaseModel):
+    comment: int
+    rating: int
+    contractId: int
+
+class ClientReviewBase(BaseModel):
+    personaId: int
+    reviewId: int
+
+class SpecialistReviewBase(BaseModel):
+    specialistId: int
+    reviewId: int

@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 
 from config.database import engine, get_db
 import models.models as models
-from schemas.schemas import UserBase, ContractBase, PostBase, AvailableDateBase, PersonaBase, ProfessionBase, SpecialistBase, ProvinceBase, CityBase, DistrictBase, UbicationBase
+from schemas.schemas import UserBase, ContractBase, PostBase, AvailableDateBase, PersonaBase, ProfessionBase, SpecialistBase, ProvinceBase, CityBase, DistrictBase, UbicationBase, ReviewBase, ClientReviewBase, SpecialistReviewBase
 
 app = FastAPI(title="AlToqueAPI")
 models.Base.metadata.create_all(bind=engine)
@@ -302,19 +302,119 @@ async def delete_availableDate(availableDate_id: int, db:db_dependency):
 
 
 """ Review """
+@app.post("/reviews", status_code=status.HTTP_201_CREATED, tags=["Reviews"])
+async def create_review(review: ReviewBase, db: db_dependency):
+    db_review = models.Review(**review.dict())
+    db.add(db_review)
+    db.commit()
+    return db_review
 
+@app.get("/reviews/{review_id}", status_code=status.HTTP_200_OK, tags=["Reviews"])
+async def read_review(review_id: int, db: db_dependency):
+    review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return review
+
+@app.put("/reviews/{review_id}", status_code=status.HTTP_200_OK, tags=["Reviews"])
+async def update_review(review_id: int, review: ReviewBase, db: db_dependency):
+    db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if db_review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(review).items():
+        setattr(db_review, var, value) if value else None
+
+    db.commit()
+    return {"message": "Review updated successfully"}
+
+@app.delete("/reviews/{review_id}", status_code=status.HTTP_200_OK, tags=["Reviews"])
+async def delete_review(review_id: int, db:db_dependency):
+    db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if db_review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    db.delete(db_review)
+    db.commit()
+    return {"message": "Review deleted successfully"}
 
 
 
 
 """ ClientReview """
+@app.post("/clientReviews", status_code=status.HTTP_201_CREATED, tags=["ClientReviews"])
+async def create_clientReview(clientReview: ClientReviewBase, db: db_dependency):
+    db_clientReview = models.ClientReview(**clientReview.dict())
+    db.add(db_clientReview)
+    db.commit()
+    return db_clientReview
 
+@app.get("/clientReviews/{clientReview_id}", status_code=status.HTTP_200_OK, tags=["ClientReviews"])
+async def read_clientReview(clientReview_id: int, db: db_dependency):
+    clientReview = db.query(models.ClientReview).filter(models.ClientReview.id == clientReview_id).first()
+    if clientReview is None:
+        raise HTTPException(status_code=404, detail="clientReview not found")
+    return clientReview
+
+@app.put("/clientReviews/{clientReview_id}", status_code=status.HTTP_200_OK, tags=["ClientReviews"])
+async def update_clientReview(clientReview_id: int, clientReview: ClientReviewBase, db: db_dependency):
+    db_clientReview = db.query(models.ClientReview).filter(models.ClientReview.id == clientReview_id).first()
+    if db_clientReview is None:
+        raise HTTPException(status_code=404, detail="clientReview not found")
+
+    for var, value in vars(clientReview).items():
+        setattr(db_clientReview, var, value) if value else None
+
+    db.commit()
+    return {"message": "clientReview updated successfully"}
+
+@app.delete("/clientReviews/{clientReview_id}", status_code=status.HTTP_200_OK, tags=["ClientReviews"])
+async def delete_clientReview(clientReview_id: int, db:db_dependency):
+    db_clientReview = db.query(models.ClientReview).filter(models.ClientReview.id == clientReview_id).first()
+    if db_clientReview is None:
+        raise HTTPException(status_code=404, detail="clientReview not found")
+    db.delete(db_clientReview)
+    db.commit()
+    return {"message": "clientReview deleted successfully"}
 
 
 
 
 """ SpecialistReview """
+@app.post("/specialistReviews", status_code=status.HTTP_201_CREATED, tags=["SpecialistReviews"])
+async def create_specialistReview(specialistReview: SpecialistReviewBase, db: db_dependency):
+    db_specialistReview = models.SpecialistReview(**specialistReview.dict())
+    db.add(db_specialistReview)
+    db.commit()
+    return db_specialistReview
 
+@app.get("/specialistReviews/{specialistReview_id}", status_code=status.HTTP_200_OK, tags=["SpecialistReviews"])
+async def read_specialistReview(specialistReview_id: int, db: db_dependency):
+    specialistReview = db.query(models.SpecialistReview).filter(models.SpecialistReview.id == specialistReview_id).first()
+    if specialistReview is None:
+        raise HTTPException(status_code=404, detail="SpecialistReview not found")
+    return specialistReview
+
+@app.put("/specialistReviews/{specialistReview_id}", status_code=status.HTTP_200_OK, tags=["SpecialistReviews"])
+async def update_specialistReview(specialistReview_id: int, specialistReview: SpecialistReviewBase, db: db_dependency):
+    db_specialistReview = db.query(models.SpecialistReview).filter(models.SpecialistReview.id == specialistReview_id).first()
+    if db_specialistReview is None:
+        raise HTTPException(status_code=404, detail="SpecialistReview not found")
+
+    for var, value in vars(specialistReview).items():
+        setattr(db_specialistReview, var, value) if value else None
+
+    db.commit()
+    return {"message": "specialistReview updated successfully"}
+
+@app.delete("/specialistReviews/{specialistReview_id}", status_code=status.HTTP_200_OK, tags=["SpecialistReviews"])
+async def delete_specialistReview(specialistReview_id: int, db:db_dependency):
+    db_specialistReview = db.query(models.SpecialistReview).filter(models.SpecialistReview.id == specialistReview_id).first()
+    if db_specialistReview is None:
+        raise HTTPException(status_code=404, detail="SpecialistReview not found")
+    db.delete(db_specialistReview)
+    db.commit()
+    return {"message": "SpecialistReview deleted successfully"}
 
 
 
