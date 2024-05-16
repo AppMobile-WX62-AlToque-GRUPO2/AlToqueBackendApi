@@ -1,0 +1,597 @@
+from fastapi import HTTPException, Depends, status, APIRouter
+from typing import Annotated
+from sqlalchemy.orm import Session
+
+from config.database import get_db
+import models.models as models
+from schemas.schemas import UserBase, ContractBase, PostBase, AvailableDateBase, PersonaBase, ProfessionBase, SpecialistBase, ProvinceBase, CityBase, DistrictBase, UbicationBase, ReviewBase, ClientReviewBase, SpecialistReviewBase
+
+router = APIRouter()
+
+db_dependency = Annotated[Session, Depends(get_db)]
+
+""" Users """
+@router.get("/users", status_code=status.HTTP_200_OK, tags=["Users"])
+async def read_users(db: db_dependency):
+    users = db.query(models.User).all()
+    if not users:
+        raise HTTPException(status_code=404, detail="No users found")
+    return users
+
+@router.get("/users/{user_id}", status_code=status.HTTP_200_OK, tags=["Users"])
+async def read_user(user_id: int, db: db_dependency):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+@router.post("/users", status_code=status.HTTP_201_CREATED, tags=["Users"])
+async def create_user(user: UserBase, db: db_dependency):
+    db_user = models.User(**user.dict())
+    db.add(db_user)
+    db.commit()
+
+@router.put("/users/{user_id}", status_code=status.HTTP_200_OK, tags=["Users"])
+async def update_user(user_id: int, user: UserBase, db: db_dependency):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(user).items():
+        setattr(db_user, var, value) if value else None
+
+    db.commit()
+    return {"message": "User updated successfully"}
+
+@router.delete("/users/{user_id}", status_code=status.HTTP_200_OK, tags=["Users"])
+async def delete_user(user_id: int, db:db_dependency):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(db_user)
+    db.commit()
+
+""" Natural People """
+@router.get("/people", status_code=status.HTTP_200_OK, tags=["Natural People"])
+async def read_users(db: db_dependency):
+    people = db.query(models.Persona).all()
+    if not people:
+        raise HTTPException(status_code=404, detail="No persona found")
+    return people
+
+@router.get("/people/{persona_id}", status_code=status.HTTP_200_OK, tags=["Natural People"])
+async def read_user(persona_id: int, db: db_dependency):
+    persona = db.query(models.Persona).filter(models.Persona.id == persona_id).first()
+    if persona is None:
+        raise HTTPException(status_code=404, detail="Pesona not found")
+    return persona
+
+@router.post("/people", status_code=status.HTTP_201_CREATED, tags=["Natural People"])
+async def create_persona(persona: PersonaBase, db: db_dependency):
+    db_persona = models.Persona(**persona.dict())
+    db.add(db_persona)
+    db.commit()
+    return db_persona
+
+@router.put("/people/{persona_id}", status_code=status.HTTP_200_OK, tags=["Natural People"])
+async def update_persona(persona_id: int, persona: PersonaBase, db: db_dependency):
+    db_persona = db.query(models.Persona).filter(models.Persona.id == persona_id).first()
+    if db_persona is None:
+        raise HTTPException(status_code=404, detail="Persona not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(persona).items():
+        setattr(db_persona, var, value) if value else None
+
+    db.commit()
+    return {"message": "Persona updated successfully"}
+
+@router.delete("/people/{persona_id}", status_code=status.HTTP_200_OK, tags=["Natural People"])
+async def delete_persona(persona_id: int, db:db_dependency):
+    db_persona = db.query(models.Persona).filter(models.Persona.id == persona_id).first()
+    if db_persona is None:
+        raise HTTPException(status_code=404, detail="Persona not found")
+    db.delete(db_persona)
+    db.commit()
+    return {"message": "Persona deleted successfully"}
+
+
+
+
+""" Professions """
+@router.post("/professions", status_code=status.HTTP_201_CREATED, tags=["Professions"])
+async def create_profession(profession: ProfessionBase, db: db_dependency):
+    db_profession = models.Profession(**profession.dict())
+    db.add(db_profession)
+    db.commit()
+    return db_profession
+
+@router.get("/professions/{profession_id}", status_code=status.HTTP_200_OK, tags=["Professions"])
+async def read_profession(profession_id: int, db: db_dependency):
+    profession = db.query(models.Profession).filter(models.Profession.id == profession_id).first()
+    if profession is None:
+        raise HTTPException(status_code=404, detail="Profession not found")
+    return profession
+
+@router.put("/professions/{profession_id}", status_code=status.HTTP_200_OK, tags=["Professions"])
+async def update_profession(profession_id: int, profession: ProfessionBase, db: db_dependency):
+    db_profession = db.query(models.Profession).filter(models.Profession.id == profession_id).first()
+    if db_profession is None:
+        raise HTTPException(status_code=404, detail="Profesion not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(profession).items():
+        setattr(db_profession, var, value) if value else None
+
+    db.commit()
+    return {"message": "Profession updated successfully"}
+
+@router.delete("/professions/{profession_id}", status_code=status.HTTP_200_OK, tags=["Professions"])
+async def delete_profession(profession_id: int, db:db_dependency):
+    db_profession = db.query(models.Profession).filter(models.Profession.id == profession_id).first()
+    if db_profession is None:
+        raise HTTPException(status_code=404, detail="Profession not found")
+    db.delete(db_profession)
+    db.commit()
+    return {"message": "Profession deleted successfully"}
+
+
+""" Specialists """
+@router.post("/specialists", status_code=status.HTTP_201_CREATED, tags=["Specialists"])
+async def create_specialist(specialist: SpecialistBase, db: db_dependency):
+    db_specialist = models.Specialist(**specialist.dict())
+    db.add(db_specialist)
+    db.commit()
+    return db_specialist
+
+@router.get("/specialists/{specialist_id}", status_code=status.HTTP_200_OK, tags=["Specialists"])
+async def read_specialist(specialist_id: int, db: db_dependency):
+    specialist = db.query(models.Specialist).filter(models.Specialist.id == specialist_id).first()
+    if specialist is None:
+        raise HTTPException(status_code=404, detail="Specialist not found")
+    return specialist
+
+@router.put("/specialists/{specialist_id}", status_code=status.HTTP_200_OK, tags=["Specialists"])
+async def update_specialist(specialist_id: int, specialist: SpecialistBase, db: db_dependency):
+    db_specialist = db.query(models.Specialist).filter(models.Specialist.id == specialist_id).first()
+    if db_specialist is None:
+        raise HTTPException(status_code=404, detail="Specialist not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(specialist).items():
+        setattr(db_specialist, var, value) if value else None
+
+    db.commit()
+    return {"message": "Specialist updated successfully"}
+
+@router.delete("/specialists/{specialist_id}", status_code=status.HTTP_200_OK, tags=["Specialists"])
+async def delete_specialist(specialist_id: int, db:db_dependency):
+    db_specialist = db.query(models.Specialist).filter(models.Specialist.id == specialist_id).first()
+    if db_specialist is None:
+        raise HTTPException(status_code=404, detail="Specialist not found")
+    db.delete(db_specialist)
+    db.commit()
+    return {"message": "Specialist deleted successfully"}
+
+
+
+
+""" Posts """
+@router.post("/posts", status_code=status.HTTP_201_CREATED, tags=["Posts"])
+async def create_post(post: PostBase, db: db_dependency):
+    db_post = models.Post(**post.dict())
+    db.add(db_post)
+    db.commit()
+    return db_post
+
+@router.get("/posts/{post_id}", status_code=status.HTTP_200_OK, tags=["Posts"])
+async def read_post(post_id: int, db: db_dependency):
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return post
+
+@router.put("/posts/{post_id}", status_code=status.HTTP_200_OK, tags=["Posts"])
+async def update_post(post_id: int, post: PostBase, db: db_dependency):
+    db_post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if db_post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(post).items():
+        setattr(db_post, var, value) if value else None
+
+    db.commit()
+    return {"message": "Post updated successfully"}
+
+@router.delete("/posts/{post_id}", status_code=status.HTTP_200_OK, tags=["Posts"])
+async def delete_post(post_id: int, db:db_dependency):
+    db_post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if db_post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    db.delete(db_post)
+    db.commit()
+    return {"message": "Post deleted successfully"}
+
+
+""" Contracts """
+@router.post("/contracts", status_code=status.HTTP_201_CREATED, tags=["Contracts"])
+async def create_contract(contract: ContractBase, db: db_dependency):
+    db_contract = models.Contract(**contract.dict())
+    db.add(db_contract)
+    db.commit()
+    return db_contract
+
+@router.get("/contracts/{contract_id}", status_code=status.HTTP_200_OK, tags=["Contracts"])
+async def read_contract(contract_id: int, db: db_dependency):
+    contract = db.query(models.Contract).filter(models.Contract.id == contract_id).first()
+    if contract is None:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    return contract
+
+@router.put("/contracts/{contract_id}", status_code=status.HTTP_200_OK, tags=["Contracts"])
+async def update_contract(contract_id: int, contract: ContractBase, db: db_dependency):
+    db_contract = db.query(models.Contract).filter(models.Contract.id == contract_id).first()
+    if db_contract is None:
+        raise HTTPException(status_code=404, detail="Contract not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(contract).items():
+        setattr(db_contract, var, value) if value else None
+
+    db.commit()
+    return {"message": "Contract updated successfully"}
+
+@router.delete("/contracts/{contract_id}", status_code=status.HTTP_200_OK, tags=["Contracts"])
+async def delete_contract(contract_id: int, db:db_dependency):
+    db_contract = db.query(models.Contract).filter(models.Contract.id == contract_id).first()
+    if db_contract is None:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    db.delete(db_contract)
+    db.commit()
+    return {"message": "Contract deleted successfully"}
+
+
+
+
+
+""" AvailableDate """
+@router.post("/availableDates", status_code=status.HTTP_201_CREATED, tags=["AvailableDates"])
+async def create_availableDate(availableDate: AvailableDateBase, db: db_dependency):
+    db_dates = models.AvailableDate(**availableDate.dict())
+    db.add(db_dates)
+    db.commit()
+    return db_dates
+
+@router.get("/availableDates/{availableDate_id}", status_code=status.HTTP_200_OK, tags=["AvailableDates"])
+async def read_availableDates(availableDate_id: int, db: db_dependency):
+    availableDate = db.query(models.AvailableDate).filter(models.AvailableDate.id == availableDate_id).first()
+    if availableDate is None:
+        raise HTTPException(status_code=404, detail="available date not found")
+    return availableDate
+
+@router.put("/availableDates/{availableDate_id}", status_code=status.HTTP_200_OK, tags=["AvailableDates"])
+async def update_availableDate(availableDate_id: int, availableDate: PostBase, db: db_dependency):
+    db_dates = db.query(models.AvailableDate).filter(models.AvailableDate.id == availableDate_id).first()
+    if db_dates is None:
+        raise HTTPException(status_code=404, detail="available date not found")
+
+    for var, value in vars(availableDate).items():
+        setattr(db_dates, var, value) if value else None
+
+    db.commit()
+    return {"message": "available date updated successfully"}
+
+@router.delete("/availableDates/{availableDate_id}", status_code=status.HTTP_200_OK, tags=["AvailableDates"])
+async def delete_availableDate(availableDate_id: int, db:db_dependency):
+    db_dates = db.query(models.AvailableDate).filter(models.AvailableDate.id == availableDate_id).first()
+    if db_dates is None:
+        raise HTTPException(status_code=404, detail="available date not found")
+    db.delete(db_dates)
+    db.commit()
+    return {"message": "available date deleted successfully"}
+
+
+
+""" Review """
+@router.post("/reviews", status_code=status.HTTP_201_CREATED, tags=["Reviews"])
+async def create_review(review: ReviewBase, db: db_dependency):
+    db_review = models.Review(**review.dict())
+    db.add(db_review)
+    db.commit()
+    return db_review
+
+@router.get("/reviews/{review_id}", status_code=status.HTTP_200_OK, tags=["Reviews"])
+async def read_review(review_id: int, db: db_dependency):
+    review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return review
+
+@router.put("/reviews/{review_id}", status_code=status.HTTP_200_OK, tags=["Reviews"])
+async def update_review(review_id: int, review: ReviewBase, db: db_dependency):
+    db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if db_review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(review).items():
+        setattr(db_review, var, value) if value else None
+
+    db.commit()
+    return {"message": "Review updated successfully"}
+
+@router.delete("/reviews/{review_id}", status_code=status.HTTP_200_OK, tags=["Reviews"])
+async def delete_review(review_id: int, db:db_dependency):
+    db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if db_review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    db.delete(db_review)
+    db.commit()
+    return {"message": "Review deleted successfully"}
+
+
+
+
+""" ClientReview """
+@router.post("/clientReviews", status_code=status.HTTP_201_CREATED, tags=["ClientReviews"])
+async def create_clientReview(clientReview: ClientReviewBase, db: db_dependency):
+    db_clientReview = models.ClientReview(**clientReview.dict())
+    db.add(db_clientReview)
+    db.commit()
+    return db_clientReview
+
+@router.get("/clientReviews/{clientReview_id}", status_code=status.HTTP_200_OK, tags=["ClientReviews"])
+async def read_clientReview(clientReview_id: int, db: db_dependency):
+    clientReview = db.query(models.ClientReview).filter(models.ClientReview.id == clientReview_id).first()
+    if clientReview is None:
+        raise HTTPException(status_code=404, detail="clientReview not found")
+    return clientReview
+
+@router.put("/clientReviews/{clientReview_id}", status_code=status.HTTP_200_OK, tags=["ClientReviews"])
+async def update_clientReview(clientReview_id: int, clientReview: ClientReviewBase, db: db_dependency):
+    db_clientReview = db.query(models.ClientReview).filter(models.ClientReview.id == clientReview_id).first()
+    if db_clientReview is None:
+        raise HTTPException(status_code=404, detail="clientReview not found")
+
+    for var, value in vars(clientReview).items():
+        setattr(db_clientReview, var, value) if value else None
+
+    db.commit()
+    return {"message": "clientReview updated successfully"}
+
+@router.delete("/clientReviews/{clientReview_id}", status_code=status.HTTP_200_OK, tags=["ClientReviews"])
+async def delete_clientReview(clientReview_id: int, db:db_dependency):
+    db_clientReview = db.query(models.ClientReview).filter(models.ClientReview.id == clientReview_id).first()
+    if db_clientReview is None:
+        raise HTTPException(status_code=404, detail="clientReview not found")
+    db.delete(db_clientReview)
+    db.commit()
+    return {"message": "clientReview deleted successfully"}
+
+
+
+
+""" SpecialistReview """
+@router.post("/specialistReviews", status_code=status.HTTP_201_CREATED, tags=["SpecialistReviews"])
+async def create_specialistReview(specialistReview: SpecialistReviewBase, db: db_dependency):
+    db_specialistReview = models.SpecialistReview(**specialistReview.dict())
+    db.add(db_specialistReview)
+    db.commit()
+    return db_specialistReview
+
+@router.get("/specialistReviews/{specialistReview_id}", status_code=status.HTTP_200_OK, tags=["SpecialistReviews"])
+async def read_specialistReview(specialistReview_id: int, db: db_dependency):
+    specialistReview = db.query(models.SpecialistReview).filter(models.SpecialistReview.id == specialistReview_id).first()
+    if specialistReview is None:
+        raise HTTPException(status_code=404, detail="SpecialistReview not found")
+    return specialistReview
+
+@router.put("/specialistReviews/{specialistReview_id}", status_code=status.HTTP_200_OK, tags=["SpecialistReviews"])
+async def update_specialistReview(specialistReview_id: int, specialistReview: SpecialistReviewBase, db: db_dependency):
+    db_specialistReview = db.query(models.SpecialistReview).filter(models.SpecialistReview.id == specialistReview_id).first()
+    if db_specialistReview is None:
+        raise HTTPException(status_code=404, detail="SpecialistReview not found")
+
+    for var, value in vars(specialistReview).items():
+        setattr(db_specialistReview, var, value) if value else None
+
+    db.commit()
+    return {"message": "specialistReview updated successfully"}
+
+@router.delete("/specialistReviews/{specialistReview_id}", status_code=status.HTTP_200_OK, tags=["SpecialistReviews"])
+async def delete_specialistReview(specialistReview_id: int, db:db_dependency):
+    db_specialistReview = db.query(models.SpecialistReview).filter(models.SpecialistReview.id == specialistReview_id).first()
+    if db_specialistReview is None:
+        raise HTTPException(status_code=404, detail="SpecialistReview not found")
+    db.delete(db_specialistReview)
+    db.commit()
+    return {"message": "SpecialistReview deleted successfully"}
+
+
+
+
+""" Provinces """
+@router.get("/provinces", status_code=status.HTTP_200_OK, tags=["Provinces"])
+async def read_provinces(db: db_dependency):
+    provinces = db.query(models.Province).all()
+    if not provinces:
+        raise HTTPException(status_code=404, detail="No users found")
+    return provinces
+
+@router.get("/provinces/{province_id}", status_code=status.HTTP_200_OK, tags=["Provinces"])
+async def read_province(province_id: int, db: db_dependency):
+    province = db.query(models.Province).filter(models.Province.id == province_id).first()
+    if province is None:
+        raise HTTPException(status_code=404, detail="Province not found")
+    return province
+
+@router.post("/provinces", status_code=status.HTTP_201_CREATED, tags=["Provinces"])
+async def create_province(province: ProvinceBase, db: db_dependency):
+    db_province = models.Province(**province.dict())
+    db.add(db_province)
+    db.commit()
+    return db_province
+
+@router.put("/provinces/{province_id}", status_code=status.HTTP_200_OK, tags=["Provinces"])
+async def update_province(province_id: int, province: ProvinceBase, db: db_dependency):
+    db_province = db.query(models.Province).filter(models.Province.id == province_id).first()
+    if db_province is None:
+        raise HTTPException(status_code=404, detail="Province not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(province).items():
+        setattr(db_province, var, value) if value else None
+
+    db.commit()
+    return {"message": "Province updated successfully"}
+
+@router.delete("/provinces/{province_id}", status_code=status.HTTP_200_OK, tags=["Provinces"])
+async def delete_province(province_id: int, db:db_dependency):
+    db_province = db.query(models.Province).filter(models.Province.id == province_id).first()
+    if db_province is None:
+        raise HTTPException(status_code=404, detail="Province not found")
+    db.delete(db_province)
+    db.commit()
+    return {"message": "Province eliminated successfully"}
+
+
+
+
+""" Cities """
+@router.get("/cities", status_code=status.HTTP_200_OK, tags=["Cities"])
+async def read_cities(db: db_dependency):
+    cities = db.query(models.City).all()
+    if not cities:
+        raise HTTPException(status_code=404, detail="No cities found")
+    return cities
+
+@router.get("/cities/{city_id}", status_code=status.HTTP_200_OK, tags=["Cities"])
+async def read_city(city_id: int, db: db_dependency):
+    city = db.query(models.City).filter(models.City.id == city_id).first()
+    if city is None:
+        raise HTTPException(status_code=404, detail="City not found")
+    return city
+
+@router.post("/cities", status_code=status.HTTP_201_CREATED, tags=["Cities"])
+async def create_city(city: CityBase, db: db_dependency):
+    db_city = models.City(**city.dict())
+    db.add(db_city)
+    db.commit()
+    return db_city
+
+@router.put("/cities/{city_id}", status_code=status.HTTP_200_OK, tags=["Cities"])
+async def update_city(city_id: int, city: CityBase, db: db_dependency):
+    db_city = db.query(models.City).filter(models.City.id == city_id).first()
+    if db_city is None:
+        raise HTTPException(status_code=404, detail="City not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(city).items():
+        setattr(db_city, var, value) if value else None
+
+    db.commit()
+    return {"message": "Province updated successfully"}
+
+@router.delete("/cities/{city_id}", status_code=status.HTTP_200_OK, tags=["Cities"])
+async def delete_city(city_id: int, db:db_dependency):
+    db_city = db.query(models.City).filter(models.City.id == city_id).first()
+    if db_city is None:
+        raise HTTPException(status_code=404, detail="City not found")
+    db.delete(db_city)
+    db.commit()
+    return {"message": "City eliminated successfully"}
+
+
+
+""" Districts """
+@router.get("/districts", status_code=status.HTTP_200_OK, tags=["Districts"])
+async def read_districts(db: db_dependency):
+    districts = db.query(models.District).all()
+    if not districts:
+        raise HTTPException(status_code=404, detail="No District found")
+    return districts
+
+@router.get("/districts/{district_id}", status_code=status.HTTP_200_OK, tags=["Districts"])
+async def read_district(district_id: int, db: db_dependency):
+    district = db.query(models.District).filter(models.District.id == district_id).first()
+    if district is None:
+        raise HTTPException(status_code=404, detail="District not found")
+    return district
+
+@router.post("/districts", status_code=status.HTTP_201_CREATED, tags=["Districts"])
+async def create_district(district: DistrictBase, db: db_dependency):
+    db_district = models.District(**district.dict())
+    db.add(db_district)
+    db.commit()
+    return db_district
+
+@router.put("/districts/{district_id}", status_code=status.HTTP_200_OK, tags=["Districts"])
+async def update_district(district_id: int, district: DistrictBase, db: db_dependency):
+    db_district = db.query(models.District).filter(models.District.id == district_id).first()
+    if db_district is None:
+        raise HTTPException(status_code=404, detail="City not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(district).items():
+        setattr(db_district, var, value) if value else None
+
+    db.commit()
+    return {"message": "District updated successfully"}
+
+@router.delete("/districts/{district_id}", status_code=status.HTTP_200_OK, tags=["Districts"])
+async def delete_district(district_id: int, db:db_dependency):
+    db_district = db.query(models.District).filter(models.District.id == district_id).first()
+    if db_district is None:
+        raise HTTPException(status_code=404, detail="District not found")
+    db.delete(db_district)
+    db.commit()
+    return {"message": "District eliminated successfully"}
+
+
+
+
+""" Ubications """
+@router.get("/ubications", status_code=status.HTTP_200_OK, tags=["Ubications"])
+async def read_ubications(db: db_dependency):
+    ubications = db.query(models.Ubication).all()
+    if not ubications:
+        raise HTTPException(status_code=404, detail="No Ubication found")
+    return ubications
+
+@router.get("/ubications/{ubication_id}", status_code=status.HTTP_200_OK, tags=["Ubications"])
+async def read_ubication(ubication_id: int, db: db_dependency):
+    ubication = db.query(models.Ubication).filter(models.Ubication.id == ubication_id).first()
+    if ubication is None:
+        raise HTTPException(status_code=404, detail="Ubication not found")
+    return ubication
+
+@router.post("/ubications", status_code=status.HTTP_201_CREATED, tags=["Ubications"])
+async def create_ubication(ubication: UbicationBase, db: db_dependency):
+    db_ubication = models.Ubication(**ubication.dict())
+    db.add(db_ubication)
+    db.commit()
+    return db_ubication
+
+@router.put("/ubications/{ubication_id}", status_code=status.HTTP_200_OK, tags=["Ubications"])
+async def update_ubication(ubication_id: int, ubication: UbicationBase, db: db_dependency):
+    db_ubication = db.query(models.Ubication).filter(models.Ubication.id == ubication_id).first()
+    if db_ubication is None:
+        raise HTTPException(status_code=404, detail="City not found")
+
+    # Actualizar los campos necesarios
+    for var, value in vars(ubication).items():
+        setattr(db_ubication, var, value) if value else None
+
+    db.commit()
+    return {"message": "Ubication updated successfully"}
+
+@router.delete("/ubications/{ubication_id}", status_code=status.HTTP_200_OK, tags=["Ubications"])
+async def delete_ubication(ubication_id: int, db:db_dependency):
+    db_ubication = db.query(models.Ubication).filter(models.Ubication.id == ubication_id).first()
+    if db_ubication is None:
+        raise HTTPException(status_code=404, detail="Ubication not found")
+    db.delete(db_ubication)
+    db.commit()
+    return {"message": "Ubication eliminated successfully"}
