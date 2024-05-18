@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, Float, Time
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, Float, Time, DateTime
 from config.database import Base
 
 class Province(Base):
@@ -37,21 +37,27 @@ class User(Base):
     password = Column(String(100), nullable=False)
     email = Column(String(100), nullable=False)
     role = Column(Boolean, nullable=False)
-
-class Persona(Base):
-    __tablename__ = "persona"
-
-    id = Column(Integer, primary_key=True, index=True)
     firstName = Column(String(50), nullable=False)
     lastName = Column(String(50), nullable=False)
-    avatar = Column(String(500), nullable=False)
     phone = Column(String(15), nullable=False)
     birthdate = Column(Date, nullable=False)
-    money = Column(Float(10, 2), nullable=False)
-    description = Column(String(50), nullable=False)
-    rating = Column(Integer, nullable=False)
-    userId = Column(Integer, ForeignKey('user.id'), nullable=False)
+    avatar = Column(String(500))
+    rating = Column(Integer)  
+    description = Column(String(50)) 
     ubicationId = Column(Integer, ForeignKey('ubication.id'), nullable=False)
+
+class Notification(Base):
+    __tablename__ = "notification"
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String(200), nullable=False)
+    date = Column(DateTime, nullable=False)
+    userId = Column(Integer, ForeignKey('user.id'), nullable=False)
+    
+class Client(Base):
+    __tablename__ = "client"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    userId = Column(Integer, ForeignKey('user.id'), nullable=False)
 
 class Profession(Base):
     __tablename__ = "profession"
@@ -64,20 +70,20 @@ class Specialist(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     workExperience = Column(Float(5, 2), nullable=False)
-    Profession_idProfession = Column(Integer, ForeignKey('profession.id'), nullable=False)
-    personaId = Column(Integer, ForeignKey('persona.id'), nullable=False)
     consultationPrice = Column(Float, nullable=True)
+    userId = Column(Integer, ForeignKey('user.id'), nullable=False)
+    professionId = Column(Integer, ForeignKey('profession.id'), nullable=False)
 
 class Post(Base):
     __tablename__ = "post"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(50), nullable=False)
+    title = Column(String(200), nullable=False)
     description = Column(String(200), nullable=False)
     address = Column(String(200), nullable=False)
     image = Column(String(500), nullable=False)
     is_publish = Column(Boolean, nullable=False)
-    personaId = Column(Integer, ForeignKey('persona.id'), nullable=False)
+    clientId = Column(Integer, ForeignKey('client.id'), nullable=False)
 
 class AvailableDate(Base):
     __tablename__ = "availableDate"
@@ -101,16 +107,7 @@ class Review(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     contractId = Column(Integer, ForeignKey('contract.id'), nullable=False)
-    comment = Column(String(100), nullable=False)
+    comment = Column(String(200), nullable=False)
     rating = Column(Integer, nullable=False)
-    
-class ClientReview(Base):
-    __tablename__ = "clientReview"
-    personaId = Column(Integer, ForeignKey('persona.id'), primary_key=True, index=True)
-    reviewId = Column(Integer, ForeignKey('review.id'), primary_key=True, index=True)
-
-class SpecialistReview(Base):
-    __tablename__ = "specialistReview"
-    reviewId = Column(Integer, ForeignKey('review.id'), primary_key=True, index=True)
-    specialistId = Column(Integer, ForeignKey('specialist.id'), primary_key=True, index=True)
-
+    asignedTo = Column(Boolean, nullable=False)
+    idUserAsigned = Column(Integer, nullable=False)

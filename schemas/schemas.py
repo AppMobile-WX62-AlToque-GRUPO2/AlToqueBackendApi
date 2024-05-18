@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class ProvinceBase(BaseModel):
     name: str
@@ -19,17 +19,22 @@ class UserBase(BaseModel):
     password: str
     email: str
     role: bool
-
-class PersonaBase(BaseModel):
     firstName: str
     lastName: str
-    avatar: str
     phone: str
-    birthdate: str
-    description: str
-    rating: int
-    userId: int
+    birthdate: str = Field(default="2002-03-21")
+    avatar: str = Field(default="https://api.dicebear.com/8.x/fun-emoji/svg?seed=Snickers")
+    description: str = Field(default="")
+    rating: int = Field(default=1)
     ubicationId: int
+
+class NotificationBase(BaseModel):
+    text: str
+    date: str
+    userId: str
+
+class ClientBase(BaseModel):
+    userId: int
 
 class ProfessionBase(BaseModel):
     name: str
@@ -37,8 +42,8 @@ class ProfessionBase(BaseModel):
 class SpecialistBase(BaseModel):
     workExperience: float
     consultationPrice: float
-    Profession_idProfession: int
-    personaId: int
+    professionId: int
+    userId: int
 
 class PostBase(BaseModel):
     title: str
@@ -46,7 +51,7 @@ class PostBase(BaseModel):
     address: str
     image: str
     is_publish: bool
-    personaId: int
+    clientId: int
 
 class AvailableDateBase(BaseModel):
     start_time: str
@@ -60,14 +65,14 @@ class ContractBase(BaseModel):
     specialistId: int
 
 class ReviewBase(BaseModel):
-    comment: int
+    comment: str
     rating: int
     contractId: int
+    asignedTo: bool
+    idUserAsigned: int
 
-class ClientReviewBase(BaseModel):
-    personaId: int
-    reviewId: int
+class Review(ReviewBase):
+    id: int
 
-class SpecialistReviewBase(BaseModel):
-    specialistId: int
-    reviewId: int
+    class Config:
+        orm_mode = True
