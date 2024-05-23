@@ -23,3 +23,7 @@ uvicorn==0.29.0
 wheel==0.41.2
 jose==1.0.0
 python-multipart==0.0.5
+PyJWT==2.6.0
+python-dotenv==1.0.0
+email-validator==2.1.0.post1
+passlib[bcrypt]==1.7.4

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 
 class ProvinceBase(BaseModel):
     name: str
@@ -15,6 +15,43 @@ class UbicationBase(BaseModel):
     address: str
     districtId: int
 
+
+
+
+#User
+class UserAuth(BaseModel):
+    email: EmailStr
+    password: str
+    role: bool
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    role: bool
+    firstName: str
+    lastName: str
+    phone: str
+    birthdate: str = Field(default="2002-03-21")
+    avatar: str = Field(default="https://api.dicebear.com/8.x/fun-emoji/svg?seed=Snickers")
+    description: str = Field(default="")
+    rating: int = Field(default=1)
+    ubicationId: int
+
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr
+    firstName: str
+    lastName: str
+    phone: str
+    birthdate: str
+    avatar: str
+    description: str
+    rating: int
+    ubicationId: int
+
+    class Config:
+        orm_mode = True
+
 class UserBase(BaseModel):
     password: str
     email: str
@@ -27,6 +64,7 @@ class UserBase(BaseModel):
     description: str = Field(default="")
     rating: int = Field(default=1)
     ubicationId: int
+
 
 class NotificationBase(BaseModel):
     text: str
