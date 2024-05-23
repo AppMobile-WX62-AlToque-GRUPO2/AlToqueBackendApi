@@ -7,6 +7,8 @@ from config.database import get_db
 import models.models as models
 from schemas.schemas import UserBase, NotificationBase, ContractBase, PostBase, AvailableDateBase, ClientBase, ProfessionBase, SpecialistBase, ProvinceBase, CityBase, DistrictBase, UbicationBase, ReviewBase, Review
 
+from routes.auth import hash_password
+
 router = APIRouter()
 
 db_dependency = Annotated[Session, Depends(get_db)]
@@ -39,7 +41,10 @@ async def update_user(user_id: int, user: UserBase, db: db_dependency):
         raise HTTPException(status_code=404, detail="User not found")
 
     for var, value in vars(user).items():
-        setattr(db_user, var, value) if value else None
+        # Si la variable es 'password', la hasheamos
+        if var == 'password' and value:
+            value = hash_password(value)
+        setattr(db_user, var, value)
 
     db.commit()
     return {"message": "User updated successfully"}
@@ -220,6 +225,13 @@ async def delete_specialist(specialist_id: int, db:db_dependency):
 
 
 """ Posts """
+@router.get("/posts", status_code=status.HTTP_200_OK, tags=["Posts"])
+async def read_posts(db: db_dependency):
+    posts = db.query(models.Post).all()
+    if not posts:
+        raise HTTPException(status_code=404, detail="No posts found")
+    return posts
+
 @router.post("/posts", status_code=status.HTTP_201_CREATED, tags=["Posts"])
 async def create_post(post: PostBase, db: db_dependency):
     db_post = models.Post(**post.dict())

@@ -12,3 +12,6 @@
 
 # Acceder a la API desplegada
 - Veo mi API en [http://127.0.0.1:8001/docs](https://altoquebackendapi.onrender.com/docs#) 
+
+
+- Todos los usuarios tienen de password: Contra1234#  
