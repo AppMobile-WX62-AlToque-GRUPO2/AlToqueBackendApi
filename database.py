@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import os
 
 MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'root'
+MYSQL_PASSWORD = 'serpiente456*'
 MYSQL_HOST = 'localhost'
 MYSQL_PORT = '3306'
 MYSQL_DATABASE = 'altoquedb'
