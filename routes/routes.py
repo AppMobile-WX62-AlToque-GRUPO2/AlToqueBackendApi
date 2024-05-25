@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Depends, status, APIRouter
+from fastapi import HTTPException, Depends, status, APIRouter, Query
 from typing import Annotated, List
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -233,10 +233,15 @@ async def delete_specialist(specialist_id: int, db:db_dependency):
 
 """ Posts """
 @router.get("/posts", status_code=status.HTTP_200_OK, tags=["Posts"])
-async def read_posts(db: db_dependency):
-    posts = db.query(models.Post).all()
-    if not posts:
-        raise HTTPException(status_code=404, detail="No posts found")
+async def read_posts(db: db_dependency, clientId: int = Query(None)):
+    if clientId is not None:
+        posts = db.query(models.Post).filter(models.Post.clientId == clientId).all()
+        if not posts:
+            raise HTTPException(status_code=404, detail=f"No posts found for client ID {clientId}")
+    else:
+        posts = db.query(models.Post).all()
+        if not posts:
+            raise HTTPException(status_code=404, detail="No posts found")
     return posts
 
 @router.post("/posts", status_code=status.HTTP_201_CREATED, tags=["Posts"])
