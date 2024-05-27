@@ -37,6 +37,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    db_user.birthdate = str(db_user.birthdate)  # Convertir birthdate a cadena
     return db_user
 
 # Login route

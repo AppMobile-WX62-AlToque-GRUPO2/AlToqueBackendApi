@@ -25,8 +25,8 @@ class UserAuth(BaseModel):
     role: bool
 
 class UserCreate(BaseModel):
-    email: EmailStr
     password: str
+    email: EmailStr
     role: bool
     firstName: str
     lastName: str
