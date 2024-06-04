@@ -258,6 +258,13 @@ async def read_post(post_id: int, db: db_dependency):
         raise HTTPException(status_code=404, detail="Post not found")
     return post
 
+@router.get("/posts", status_code=status.HTTP_200_OK, tags=["Posts"])
+async def read_poasts(db: db_dependency):
+    posts = db.query(models.Post).all()
+    if not posts:
+        raise HTTPException(status_code=404, detail="No post found")
+    return posts
+
 @router.put("/posts/{post_id}", status_code=status.HTTP_200_OK, tags=["Posts"])
 async def update_post(post_id: int, post: PostBase, db: db_dependency):
     db_post = db.query(models.Post).filter(models.Post.id == post_id).first()
@@ -282,12 +289,27 @@ async def delete_post(post_id: int, db:db_dependency):
 
 
 """ Contracts """
+
+@router.get("/contracts", status_code=status.HTTP_200_OK, tags=["Contracts"])
+async def read_contracts(db: db_dependency):
+    contracts = db.query(models.Contract).all()
+    if not contracts:
+        raise HTTPException(status_code=404, detail="No contracts found")
+    return contracts
+
 @router.post("/contracts", status_code=status.HTTP_201_CREATED, tags=["Contracts"])
 async def create_contract(contract: ContractBase, db: db_dependency):
     db_contract = models.Contract(**contract.dict())
     db.add(db_contract)
     db.commit()
     return db_contract
+
+@router.get("/contracts/state/{state}", status_code=status.HTTP_200_OK, tags=["Contracts"])
+async def get_contracts_by_state(state: int, db: db_dependency):
+    contracts = db.query(models.Contract).filter(models.Contract.state == state).all()
+    if not contracts:
+        raise HTTPException(status_code=404, detail="No contracts with state found")
+    return contracts
 
 @router.get("/contracts/{contract_id}", status_code=status.HTTP_200_OK, tags=["Contracts"])
 async def read_contract(contract_id: int, db: db_dependency):
