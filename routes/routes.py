@@ -5,7 +5,7 @@ from datetime import datetime
 
 from config.database import get_db
 import models.models as models
-from schemas.schemas import UserUpdate, UserBase, NotificationBase, ContractBase, PostBase, AvailableDateBase, ClientBase, ProfessionBase, SpecialistBase, ProvinceBase, CityBase, DistrictBase, UbicationBase, ReviewBase, Review
+from schemas.schemas import UserBase, NotificationBase, ContractBase, PostBase, AvailableDateBase, ClientBase, ProfessionBase, SpecialistBase, ProvinceBase, CityBase, DistrictBase, UbicationBase, ReviewBase, Review
 
 from routes.auth import hash_password
 
@@ -35,7 +35,7 @@ async def create_user(user: UserBase, db: db_dependency):
     db.commit()
 
 @router.put("/users/{user_id}", status_code=status.HTTP_200_OK, tags=["Users"])
-async def update_user(user_id: int, user: UserUpdate, db: db_dependency):
+async def update_user(user_id: int, user: UserBase, db: db_dependency):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -57,17 +57,15 @@ async def delete_user(user_id: int, db:db_dependency):
     db.delete(db_user)
     db.commit()
 
+
+
+
 """ Notifications """
 @router.get("/notifications", status_code=status.HTTP_200_OK, tags=["Notifications"])
-async def read_notifications(db: db_dependency, userId: int = Query(None)):
-    if userId is not None:
-        notifications = db.query(models.Notification).filter(models.Notification.userId == userId).all()
-        if not notifications:
-            raise HTTPException(status_code=404, detail=f"No notifications found for user ID {userId}")
-    else:
-        notifications = db.query(models.Notification).all()
-        if not notifications:
-            raise HTTPException(status_code=404, detail="No notifications found")
+async def read_notifications(db: db_dependency):
+    notifications = db.query(models.Notification).all()
+    if not notifications:
+        raise HTTPException(status_code=404, detail="No notifications found")
     return notifications
 
 @router.get("/notifications/{notification_id}", status_code=status.HTTP_200_OK, tags=["Notifications"])
