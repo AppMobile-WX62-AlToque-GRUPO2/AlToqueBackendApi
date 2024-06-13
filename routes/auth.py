@@ -42,6 +42,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    db_user.birthdate = str(db_user.birthdate)  # Convertir birthdate a cadena
     return db_user
 
 # Login route
@@ -53,6 +54,7 @@ def login(user: UserAuth, db: Session = Depends(get_db)):
     if not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
     token = write_token({
+        "id": db_user.id,
         "email": db_user.email,
         "role": db_user.role,
         "firstName": db_user.firstName,
