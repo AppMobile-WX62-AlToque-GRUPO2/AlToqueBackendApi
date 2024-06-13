@@ -50,7 +50,7 @@ class UserResponse(BaseModel):
     ubicationId: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserBase(BaseModel):
     password: str
@@ -113,4 +113,4 @@ class Review(ReviewBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

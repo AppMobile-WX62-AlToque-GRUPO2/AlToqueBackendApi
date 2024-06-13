@@ -5,9 +5,14 @@ from config.database import get_db
 import models.models as models
 from schemas.schemas import UserAuth, UserCreate, UserResponse
 from functions_jwt import write_token, validate_token
+from typing import Dict
 
 auth_router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Variables globales para almacenar temporalmente el token
+token_storage: Dict[str, str] = {"access_token": "", "token_type": ""}
+
 
 # Utility function to hash passwords
 def hash_password(password: str) -> str:
@@ -59,7 +64,17 @@ def login(user: UserAuth, db: Session = Depends(get_db)):
         "rating": db_user.rating,
         "ubicationId": db_user.ubicationId
     })  # Generar el token JWT
+
+      # Almacenar el token en la variable global
+    token_storage["access_token"] = token
+    token_storage["token_type"] = "bearer"
+
     return {"access_token": token, "token_type": "bearer"}
+
+# Endpoint GET para mostrar los valores del token
+@auth_router.get("/token_info", status_code=status.HTTP_200_OK)
+def get_token_info():
+    return token_storage
 
 @auth_router.post("/verify/token")
 async def verify_token(authorization: str = Header(None)):
