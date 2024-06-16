@@ -65,6 +65,20 @@ class UserBase(BaseModel):
     rating: int = Field(default=1)
     ubicationId: int
 
+class UserUpdate(BaseModel):
+    email: str
+    role: bool
+    firstName: str
+    lastName: str
+    phone: str
+    birthdate: str = Field(default="2002-03-21")
+    avatar: str = Field(default="https://api.dicebear.com/8.x/fun-emoji/svg?seed=Snickers")
+    description: str = Field(default="")
+    ubicationId: int
+
+
+
+
 
 class NotificationBase(BaseModel):
     text: str
