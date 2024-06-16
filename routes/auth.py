@@ -13,6 +13,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Variables globales para almacenar temporalmente el token
 token_storage: Dict[str, str] = {"access_token": "", "token_type": ""}
 
+# Variable global para almacenar user_data temporalmente
+user_data_store: Dict[str, Dict] = {}
 
 # Utility function to hash passwords
 def hash_password(password: str) -> str:
@@ -74,8 +76,19 @@ def login(user: UserAuth, db: Session = Depends(get_db)):
 
 # Endpoint GET para mostrar los valores del token
 @auth_router.get("/token_info", status_code=status.HTTP_200_OK)
-def get_token_info():
+def token_info():
     return token_storage
+
+async def get_current_user(authorization: str = Header(None)):
+    if authorization is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authorization header missing")
+    parts = authorization.split(" ")
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authorization header format")
+    token = parts[1]
+    if token not in user_data_store:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token not found or invalid")
+    return user_data_store[token]
 
 @auth_router.post("/verify/token")
 async def verify_token(authorization: str = Header(None)):
@@ -87,6 +100,12 @@ async def verify_token(authorization: str = Header(None)):
     token = parts[1]
     try:
         user_data = validate_token(token, output=True)
+        user_data_store[token] = user_data  # Guardar user_data usando el token como clave
         return user_data
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token validation failed: {str(e)}")
+
+
+@auth_router.get("/user/data")
+async def get_user_data(current_user: Dict = Depends(get_current_user)):
+    return current_user
