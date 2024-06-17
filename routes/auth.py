@@ -16,6 +16,9 @@ token_storage: Dict[str, str] = {"access_token": "", "token_type": ""}
 # Variable global para almacenar user_data temporalmente
 user_data_store: Dict[str, Dict] = {}
 
+#DATAA
+data: Dict[str, Dict] = {}
+
 # Utility function to hash passwords
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -113,46 +116,28 @@ async def get_user_data(current_user: Dict = Depends(get_current_user)):
 
 #POST VERIFY INTENTO
 @auth_router.post("/verificar_token", status_code=status.HTTP_200_OK)
-def verificar_token(Authorization: str = Header(...)):
-    if not Authorization.startswith("Bearer "):
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Formato de token inválido")
-    
-    token = Authorization.split(" ")[1]  # Extraer el token del header Authorization
-    try:
-        token_data = validate_token(token)  # Validar el token
-        return {
-            "id": token_data["id"],
-            "email": token_data["email"],
-            "rol": token_data["role"],
-            "nombre": token_data["firstName"],
-            "apellido": token_data["lastName"],
-            "telefono": token_data["phone"],
-            "fecha_de_nacimiento": token_data["birthdate"],
-            "avatar": token_data["avatar"],
-            "descripcion": token_data["description"],
-            "calificacion": token_data["rating"],
-            "ubicacion_id": token_data["ubicationId"]
-        }
-    except:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido o expirado")
+def verificar_token_post(user: UserAuth, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.email == user.email).filter(models.User.role == user.role).first()
+    if not db_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if not verify_password(user.password, db_user.password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
+    data["id"] = db_user.id
+    data["role"] = db_user.role
+    data["ubicationId"] = db_user.ubicationId
+    return data
 
-# Verificar token y devolver datos decodificados en español (GET)
 @auth_router.get("/verificar_token", status_code=status.HTTP_200_OK)
-def verificar_token_get(token: str = Query(...)):
-    try:
-        token_data = validate_token(token)  # Validar el token
-        return {
-            "id": token_data["id"],
-            "email": token_data["email"],
-            "rol": token_data["role"],
-            "nombre": token_data["firstName"],
-            "apellido": token_data["lastName"],
-            "telefono": token_data["phone"],
-            "fecha_de_nacimiento": token_data["birthdate"],
-            "avatar": token_data["avatar"],
-            "descripcion": token_data["description"],
-            "calificacion": token_data["rating"],
-            "ubicacion_id": token_data["ubicationId"]
-        }
-    except:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido o expirado")
+def verificar_token_get(email: str, role: str, password: str, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.email == email).filter(models.User.role == role).first()
+    if not db_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if not verify_password(password, db_user.password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
+    
+    data = {
+        "id": db_user.id,
+        "role": db_user.role,
+        "ubicationId": db_user.ubicationId
+    }
+    return data
