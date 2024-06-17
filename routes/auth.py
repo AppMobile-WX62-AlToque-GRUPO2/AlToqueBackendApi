@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Header
+from fastapi import APIRouter, Depends, HTTPException, status, Header, Query
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from config.database import get_db
@@ -79,6 +79,7 @@ def login(user: UserAuth, db: Session = Depends(get_db)):
 def token_info():
     return token_storage
 
+###-----------------------------------------------------------------
 async def get_current_user(authorization: str = Header(None)):
     if authorization is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authorization header missing")
@@ -108,20 +109,46 @@ async def verify_token(authorization: str = Header(None)):
 @auth_router.get("/user/data")
 async def get_user_data(current_user: Dict = Depends(get_current_user)):
     return current_user
+###-----------------------------------------------------------------
 
 #POST VERIFY INTENTO
-@auth_router.post("/verify/token")
-async def verify_token(authorization: str = Header(None)):
-    if authorization is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authorization header missing")
-
-    parts = authorization.split(" ")
-    if len(parts) != 2 or parts[0].lower() != "bearer":
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authorization header format")
-
-    token = parts[1]
+@auth_router.post("/verify/token/post", status_code=status.HTTP_200_OK)
+def verificar_token(Authorization: str = Header(...)):
+    token = Authorization.split(" ")[1]  # Extraer el token del header Authorization
     try:
-        user_data = validate_token(token, output=True)  # Retrieve user data before encryption
-        return user_data
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token validation failed: {str(e)}")
+        token_data = validate_token(token)  # Validar el token
+        return {
+            "id": token_data["id"],
+            "email": token_data["email"],
+            "rol": token_data["role"],
+            "nombre": token_data["firstName"],
+            "apellido": token_data["lastName"],
+            "telefono": token_data["phone"],
+            "fecha_de_nacimiento": token_data["birthdate"],
+            "avatar": token_data["avatar"],
+            "descripcion": token_data["description"],
+            "calificacion": token_data["rating"],
+            "ubicacion_id": token_data["ubicationId"]
+        }
+    except:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido o expirado")
+    
+@auth_router.get("/verify/token/get", status_code=status.HTTP_200_OK)
+def verificar_token_get(token: str = Query(...)):
+    try:
+        token_data = validate_token(token)  # Validar el token
+        return {
+            "id": token_data["id"],
+            "email": token_data["email"],
+            "rol": token_data["role"],
+            "nombre": token_data["firstName"],
+            "apellido": token_data["lastName"],
+            "telefono": token_data["phone"],
+            "fecha_de_nacimiento": token_data["birthdate"],
+            "avatar": token_data["avatar"],
+            "descripcion": token_data["description"],
+            "calificacion": token_data["rating"],
+            "ubicacion_id": token_data["ubicationId"]
+        }
+    except:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido o expirado")
