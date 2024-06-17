@@ -105,20 +105,23 @@ async def verify_token(authorization: str = Header(None)):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token validation failed: {str(e)}")
 
-
 @auth_router.get("/user/data")
 async def get_user_data(current_user: Dict = Depends(get_current_user)):
     return current_user
 
 #POST VERIFY INTENTO
-@auth_router.post("/verify/token/login", status_code=status.HTTP_200_OK)
-async def verify_token(authorization: str):
+@auth_router.post("/verify/token")
+async def verify_token(authorization: str = Header(None)):
+    if authorization is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authorization header missing")
+
     parts = authorization.split(" ")
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authorization header format")
+
     token = parts[1]
     try:
-        user_data = validate_token(token, output=True)
-        user_data_store[token] = user_data  # Guardar user_data usando el token como clave
+        user_data = validate_token(token, output=True)  # Retrieve user data before encryption
         return user_data
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token validation failed: {str(e)}")
-    
