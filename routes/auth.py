@@ -112,8 +112,11 @@ async def get_user_data(current_user: Dict = Depends(get_current_user)):
 ###-----------------------------------------------------------------
 
 #POST VERIFY INTENTO
-@auth_router.post("/verify/token/post", status_code=status.HTTP_200_OK)
+@auth_router.post("/verificar_token", status_code=status.HTTP_200_OK)
 def verificar_token(Authorization: str = Header(...)):
+    if not Authorization.startswith("Bearer "):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Formato de token inválido")
+    
     token = Authorization.split(" ")[1]  # Extraer el token del header Authorization
     try:
         token_data = validate_token(token)  # Validar el token
@@ -132,8 +135,9 @@ def verificar_token(Authorization: str = Header(...)):
         }
     except:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido o expirado")
-    
-@auth_router.get("/verify/token/get", status_code=status.HTTP_200_OK)
+
+# Verificar token y devolver datos decodificados en español (GET)
+@auth_router.get("/verificar_token", status_code=status.HTTP_200_OK)
 def verificar_token_get(token: str = Query(...)):
     try:
         token_data = validate_token(token)  # Validar el token
