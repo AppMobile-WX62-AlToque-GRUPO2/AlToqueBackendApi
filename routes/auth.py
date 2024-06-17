@@ -128,16 +128,5 @@ def verificar_token_post(user: UserAuth, db: Session = Depends(get_db)):
     return data
 
 @auth_router.get("/verificar_token", status_code=status.HTTP_200_OK)
-def verificar_token_get(email: str, role: str, password: str, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.email == email).filter(models.User.role == role).first()
-    if not db_user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    if not verify_password(password, db_user.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
-    
-    data = {
-        "id": db_user.id,
-        "role": db_user.role,
-        "ubicationId": db_user.ubicationId
-    }
+def verificar_token_get():
     return data
