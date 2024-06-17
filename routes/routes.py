@@ -62,10 +62,15 @@ async def delete_user(user_id: int, db:db_dependency):
 
 """ Notifications """
 @router.get("/notifications", status_code=status.HTTP_200_OK, tags=["Notifications"])
-async def read_notifications(db: db_dependency):
-    notifications = db.query(models.Notification).all()
-    if not notifications:
-        raise HTTPException(status_code=404, detail="No notifications found")
+async def read_notifications(db: db_dependency, userId: int = Query(None)):
+    if userId is not None:
+        notifications = db.query(models.Notification).filter(models.Notification.userId == userId).all()
+        if not notifications:
+            raise HTTPException(status_code=404, detail=f"No notifications found for user ID {userId}")
+    else:
+        notifications = db.query(models.Notification).all()
+        if not notifications:
+            raise HTTPException(status_code=404, detail="No notifications found")
     return notifications
 
 @router.get("/notifications/{notification_id}", status_code=status.HTTP_200_OK, tags=["Notifications"])
