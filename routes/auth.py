@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Header, Query
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from config.database import get_db
@@ -7,6 +7,7 @@ from schemas.schemas import UserAuth, UserCreate, UserResponse
 from functions_jwt import write_token, validate_token
 from typing import Dict
 
+app = FastAPI()
 auth_router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -15,9 +16,6 @@ token_storage: Dict[str, str] = {"access_token": "", "token_type": ""}
 
 # Variable global para almacenar user_data temporalmente
 user_data_store: Dict[str, Dict] = {}
-
-#DATAA
-data: Dict[str, Dict] = {}
 
 # Utility function to hash passwords
 def hash_password(password: str) -> str:
@@ -28,7 +26,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 # Register route
-@auth_router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@auth_router.post("/auth/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register(user: UserCreate, db: Session = Depends(get_db)):
     hashed_password = hash_password(user.password)
     db_user = models.User(
@@ -47,10 +45,11 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    db_user.birthdate = db_user.birthdate.isoformat()  # Convertir birthdate a cadena
     return db_user
 
 # Login route
-@auth_router.post("/login", status_code=status.HTTP_200_OK)
+@auth_router.post("/auth/login", status_code=status.HTTP_200_OK)
 def login(user: UserAuth, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).filter(models.User.role == user.role).first()
     if not db_user:
@@ -71,14 +70,14 @@ def login(user: UserAuth, db: Session = Depends(get_db)):
         "ubicationId": db_user.ubicationId
     })  # Generar el token JWT
 
-      # Almacenar el token en la variable global
+    # Almacenar el token en la variable global
     token_storage["access_token"] = token
     token_storage["token_type"] = "bearer"
 
     return {"access_token": token, "token_type": "bearer"}
 
 # Endpoint GET para mostrar los valores del token
-@auth_router.get("/token_info", status_code=status.HTTP_200_OK)
+@auth_router.get("/auth/token_info", status_code=status.HTTP_200_OK)
 def token_info():
     return token_storage
 
@@ -94,7 +93,7 @@ async def get_current_user(authorization: str = Header(None)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token not found or invalid")
     return user_data_store[token]
 
-@auth_router.post("/verify/token")
+@auth_router.post("/auth/verify/token")
 async def verify_token(authorization: str = Header(None)):
     if authorization is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authorization header missing")
@@ -109,13 +108,15 @@ async def verify_token(authorization: str = Header(None)):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token validation failed: {str(e)}")
 
-@auth_router.get("/user/data")
+@auth_router.get("/auth/user/data")
 async def get_user_data(current_user: Dict = Depends(get_current_user)):
     return current_user
 ###-----------------------------------------------------------------
 
 #POST VERIFY INTENTO
-@auth_router.post("/verificar_token", status_code=status.HTTP_200_OK)
+data: Dict[str, Dict] = {}
+
+@auth_router.post("/auth/verificar_token", status_code=status.HTTP_200_OK)
 def verificar_token_post(user: UserAuth, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).filter(models.User.role == user.role).first()
     if not db_user:
@@ -127,6 +128,6 @@ def verificar_token_post(user: UserAuth, db: Session = Depends(get_db)):
     data["ubicationId"] = db_user.ubicationId
     return data
 
-@auth_router.get("/verificar_token", status_code=status.HTTP_200_OK)
+@auth_router.get("/auth/verificar_token", status_code=status.HTTP_200_OK)
 def verificar_token_get():
     return data

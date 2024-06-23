@@ -32,7 +32,7 @@ class UserCreate(BaseModel):
     lastName: str
     phone: str
     birthdate: str = Field(default="2002-03-21")
-    avatar: str = Field(default="https://api.dicebear.com/8.x/fun-emoji/svg?seed=Snickers")
+    avatar: str = Field(default="https://as1.ftcdn.net/v2/jpg/03/39/45/96/1000_F_339459697_XAFacNQmwnvJRqe1Fe9VOptPWMUxlZP8.jpg")
     description: str = Field(default="")
     rating: int = Field(default=1)
     ubicationId: int
@@ -60,7 +60,7 @@ class UserBase(BaseModel):
     lastName: str
     phone: str
     birthdate: str = Field(default="2002-03-21")
-    avatar: str = Field(default="https://api.dicebear.com/8.x/fun-emoji/svg?seed=Snickers")
+    avatar: str = Field(default="https://as1.ftcdn.net/v2/jpg/03/39/45/96/1000_F_339459697_XAFacNQmwnvJRqe1Fe9VOptPWMUxlZP8.jpg")
     description: str = Field(default="")
     rating: int = Field(default=1)
     ubicationId: int
@@ -72,7 +72,7 @@ class UserUpdate(BaseModel):
     lastName: str
     phone: str
     birthdate: str = Field(default="2002-03-21")
-    avatar: str = Field(default="https://api.dicebear.com/8.x/fun-emoji/svg?seed=Snickers")
+    avatar: str = Field(default="https://as1.ftcdn.net/v2/jpg/03/39/45/96/1000_F_339459697_XAFacNQmwnvJRqe1Fe9VOptPWMUxlZP8.jpg")
     description: str = Field(default="")
     ubicationId: int
 
