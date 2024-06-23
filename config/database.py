@@ -4,9 +4,9 @@ from sqlalchemy.ext.declarative import declarative_base
 
 # MySQL database configuration
 MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'SwpDLuFhUzWYnMMUdOcJZiJiBJXcKGBA'
+MYSQL_PASSWORD = 'oeqehtJIVJTctZEKbBesoOOlBySpOSDA'
 MYSQL_HOST = 'monorail.proxy.rlwy.net'
-MYSQL_PORT = '23253'
+MYSQL_PORT = '43239'
 MYSQL_DATABASE = 'railway'
 
 # Database connection URL
