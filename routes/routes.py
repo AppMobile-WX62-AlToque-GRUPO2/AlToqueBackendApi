@@ -154,7 +154,17 @@ async def delete_client(client_id: int, db:db_dependency):
     db.commit()
     return {"message": "Client deleted successfully"}
 
+@router.get("/clients/user/{user_id}/role/{role}", status_code=status.HTTP_200_OK, tags=["Clients"])
+async def get_client_id_by_user_and_role(user_id: int, role: str, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id, models.User.role == role).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User or role not found")
 
+    client = db.query(models.Client).filter(models.Client.userId == user.id).first()
+    if client is None:
+        raise HTTPException(status_code=404, detail="Client not found")
+
+    return {"client_id": client.id}
 
 
 
@@ -233,7 +243,17 @@ async def delete_specialist(specialist_id: int, db:db_dependency):
     db.commit()
     return {"message": "Specialist deleted successfully"}
 
+@router.get("/specialists/user/{user_id}/role/{role}", status_code=status.HTTP_200_OK, tags=["Specialists"])
+async def get_specialist_id_by_user_and_role(user_id: int, role: str, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id, models.User.role == role).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User or role not found")
 
+    specialist = db.query(models.Specialist).filter(models.Specialist.userId == user.id).first()
+    if specialist is None:
+        raise HTTPException(status_code=404, detail="Specialist not found")
+
+    return {"specialist_id": specialist.id}
 
 
 """ Posts """
